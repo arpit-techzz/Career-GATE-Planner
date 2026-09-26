@@ -10,12 +10,14 @@
 <body>
 <nav class="navbar">
   <div class="nav-brand">🎯 Career & GATE Planner</div>
+  <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
   <ul class="nav-links">
     <li><a href="/">Home</a></li>
     <li><a href="/dashboard">Dashboard</a></li>
     <li><a href="/syllabus">Syllabus</a></li>
     <li><a href="/tasks">Tasks</a></li>
     <li><a href="/career">Career Goals</a></li>
+    <li><button class="theme-toggle" type="button" aria-label="Toggle dark mode">🌙</button></li>
   </ul>
 </nav>
 
@@ -24,7 +26,7 @@
 </main>
 
 <footer class="footer">
-  <p>Built with ❤️ for GATE aspirants | © 2025 Career & GATE Planner</p>
+  <p>Built with ❤️ for GATE aspirants | © 2026 Career & GATE Planner</p>
 </footer>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>

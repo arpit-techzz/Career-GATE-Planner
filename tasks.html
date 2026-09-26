@@ -4,6 +4,15 @@
 
 <h1>✅ Task Manager</h1>
 
+<div class="toolbar">
+  <input id="taskSearch" class="search-input" type="search" placeholder="Search tasks...">
+  <select id="taskFilter" class="filter-select">
+    <option value="all">All tasks</option>
+    <option value="pending">Pending</option>
+    <option value="completed">Completed</option>
+  </select>
+</div>
+
 <div class="form-card">
   <h3>Add Task</h3>
   <form id="taskForm" class="form-grid">
@@ -31,7 +40,7 @@
   </thead>
   <tbody>
     {% for t in tasks %}
-    <tr class="{{ 'done-row' if t.status == 'Completed' }}">
+    <tr class="{{ 'done-row' if t.status == 'Completed' }}" data-status="{{ t.status|lower }}" data-search="{{ (t.title ~ ' ' ~ (t.subject or '') ~ ' ' ~ t.priority)|lower }}">
       <td>
         <input type="checkbox" class="task-toggle" data-id="{{ t.id }}"
                {{ 'checked' if t.status == 'Completed' }}>
