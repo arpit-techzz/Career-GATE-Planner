@@ -10,8 +10,8 @@
     <span class="stat-label">Overall Syllabus</span>
   </div>
   <div class="stat-card">
-    <span class="stat-value">{{ pending }}</span>
-    <span class="stat-label">Pending Tasks</span>
+    <span class="stat-value">{{ overdue }}</span>
+    <span class="stat-label">Overdue Tasks</span>
   </div>
   <div class="stat-card">
     <span class="stat-value">{{ completed }}</span>
@@ -21,6 +21,11 @@
     <span class="stat-value">{{ goals|length }}</span>
     <span class="stat-label">Career Goals</span>
   </div>
+</div>
+
+<div class="quick-actions">
+  <a href="/tasks" class="btn primary">+ Add a study task</a>
+  <a href="/syllabus" class="btn secondary">Update syllabus</a>
 </div>
 
 <section class="section">
@@ -48,10 +53,10 @@
     </thead>
     <tbody>
       {% for t in tasks %}
-      <tr>
+      <tr class="{{ 'overdue-row' if t.status == 'Pending' and t.due_date and t.due_date < today }}">
         <td>{{ t.title }}</td>
         <td>{{ t.subject }}</td>
-        <td>{{ t.due_date or '-' }}</td>
+        <td>{{ t.due_date or '-' }}{% if t.status == 'Pending' and t.due_date and t.due_date < today %}<span class="badge overdue">Overdue</span>{% endif %}</td>
         <td><span class="badge {{ t.priority|lower }}">{{ t.priority }}</span></td>
         <td>{{ t.status }}</td>
       </tr>
