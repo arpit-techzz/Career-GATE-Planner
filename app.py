@@ -1,16 +1,25 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, g
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, template_folder=ROOT_DIR, static_folder=ROOT_DIR,
             static_url_path='/static')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-only-change-this-secret')
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(ROOT_DIR, 'database.db')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # ---------- DATABASE MODELS ----------
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
 class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,6 +50,62 @@ class CareerGoal(db.Model):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'GET':
+        return render_template('signup.html')
+
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '')
+    confirm_password = request.form.get('confirm_password', '')
+
+    if not name or not email or not password:
+        return render_template('signup.html', error='All fields are required.',
+                               name=name, email=email), 400
+    if '@' not in email or '.' not in email.rsplit('@', 1)[-1]:
+        return render_template('signup.html', error='Enter a valid email address.',
+                               name=name, email=email), 400
+    if len(password) < 8:
+        return render_template('signup.html', error='Password must be at least 8 characters.',
+                               name=name, email=email), 400
+    if password != confirm_password:
+        return render_template('signup.html', error='Passwords do not match.',
+                               name=name, email=email), 400
+    if User.query.filter_by(email=email).first():
+        return render_template('signup.html', error='An account with that email already exists.',
+                               name=name, email=email), 409
+
+    user = User(name=name, email=email,
+                password_hash=generate_password_hash(password))
+    db.session.add(user)
+    db.session.commit()
+    session.clear()
+    session['user_id'] = user.id
+    return redirect(url_for('dashboard'))
+
+@app.route('/signin', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
+def signin():
+    if request.method == 'GET':
+        return render_template('signin.html')
+
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '')
+    user = User.query.filter_by(email=email).first()
+    if not user or not check_password_hash(user.password_hash, password):
+        return render_template('signin.html',
+                               error='Email or password is incorrect.',
+                               email=email), 401
+    session.clear()
+    session['user_id'] = user.id
+    return redirect(url_for('dashboard'))
+
+@app.post('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
 @app.route('/dashboard')
 def dashboard():
@@ -256,6 +321,18 @@ def seed_data():
 def initialize_database():
     db.create_all()
     seed_data()
+    g.user = None
+    user_id = session.get('user_id')
+    if user_id:
+        g.user = db.session.get(User, user_id)
+        if g.user is None:
+            session.clear()
+
+    public_endpoints = {'index', 'signup', 'signin', 'static'}
+    if request.endpoint not in public_endpoints and g.user is None:
+        if request.path.startswith('/api/'):
+            return json_error('Authentication required', 401)
+        return redirect('/signin?next=' + request.path)
 
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=8000)

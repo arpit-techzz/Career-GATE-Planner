@@ -13,10 +13,17 @@
   <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
   <ul class="nav-links">
     <li><a href="/">Home</a></li>
-    <li><a href="/dashboard">Dashboard</a></li>
-    <li><a href="/syllabus">Syllabus</a></li>
-    <li><a href="/tasks">Tasks</a></li>
-    <li><a href="/career">Career Goals</a></li>
+    {% if g.user %}
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/syllabus">Syllabus</a></li>
+      <li><a href="/tasks">Tasks</a></li>
+      <li><a href="/career">Career Goals</a></li>
+      <li class="nav-user">Hi, {{ g.user.name.split(' ')[0] }}</li>
+      <li><form action="/logout" method="post"><button class="nav-button" type="submit">Sign out</button></form></li>
+    {% else %}
+      <li><a href="/signin">Sign in</a></li>
+      <li><a class="nav-signup" href="/signup">Create account</a></li>
+    {% endif %}
     <li><button class="theme-toggle" type="button" aria-label="Toggle dark mode">🌙</button></li>
   </ul>
 </nav>

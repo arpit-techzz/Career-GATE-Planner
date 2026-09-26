@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Create Account | Career & GATE Planner{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-icon">🚀</div>
+    <h1>Create your account</h1>
+    <p class="auth-subtitle">Build a focused plan for your GATE and career goals.</p>
+    {% if error %}<div class="form-error" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" class="auth-form">
+      <label for="name">Full name</label>
+      <input id="name" name="name" type="text" value="{{ name or '' }}" autocomplete="name" required>
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" value="{{ email or '' }}" autocomplete="email" required>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required>
+      <label for="confirm_password">Confirm password</label>
+      <input id="confirm_password" name="confirm_password" type="password" minlength="8" autocomplete="new-password" required>
+      <button type="submit" class="btn primary">Create account</button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="/signin">Sign in</a></p>
+  </div>
+</section>
+{% endblock %}
