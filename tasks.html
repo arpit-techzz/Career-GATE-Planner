@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Tasks{% endblock %}
+{% block content %}
+
+<h1>✅ Task Manager</h1>
+
+<div class="form-card">
+  <h3>Add Task</h3>
+  <form id="taskForm" class="form-grid">
+    <input type="text" name="title" placeholder="Task title" required>
+    <select name="subject">
+      <option value="">-- Subject --</option>
+      {% for s in subjects %}<option>{{ s.name }}</option>{% endfor %}
+    </select>
+    <input type="date" name="due_date">
+    <select name="priority">
+      <option>High</option>
+      <option selected>Medium</option>
+      <option>Low</option>
+    </select>
+    <button type="submit" class="btn primary">+ Add Task</button>
+  </form>
+</div>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Done</th><th>Task</th><th>Subject</th><th>Due</th>
+      <th>Priority</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tasks %}
+    <tr class="{{ 'done-row' if t.status == 'Completed' }}">
+      <td>
+        <input type="checkbox" class="task-toggle" data-id="{{ t.id }}"
+               {{ 'checked' if t.status == 'Completed' }}>
+      </td>
+      <td>{{ t.title }}</td>
+      <td>{{ t.subject or '-' }}</td>
+      <td>{{ t.due_date or '-' }}</td>
+      <td><span class="badge {{ t.priority|lower }}">{{ t.priority }}</span></td>
+      <td><button class="btn danger small delete-task" data-id="{{ t.id }}">Delete</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

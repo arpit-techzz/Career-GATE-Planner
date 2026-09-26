@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<h1>📊 Dashboard</h1>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-value">{{ overall_progress }}%</span>
+    <span class="stat-label">Overall Syllabus</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">{{ pending }}</span>
+    <span class="stat-label">Pending Tasks</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">{{ completed }}</span>
+    <span class="stat-label">Completed Tasks</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">{{ goals|length }}</span>
+    <span class="stat-label">Career Goals</span>
+  </div>
+</div>
+
+<section class="section">
+  <h2>📈 Subject Progress</h2>
+  {% for s in subjects %}
+    {% set pct = (s.completed_topics / s.total_topics * 100)|int if s.total_topics else 0 %}
+    <div class="progress-item">
+      <div class="progress-head">
+        <span>{{ s.name }}</span>
+        <span>{{ s.completed_topics }}/{{ s.total_topics }} ({{ pct }}%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ pct }}%"></div>
+      </div>
+    </div>
+  {% endfor %}
+</section>
+
+<section class="section">
+  <h2>🗓️ Upcoming Tasks</h2>
+  {% if tasks %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Task</th><th>Subject</th><th>Due</th><th>Priority</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      {% for t in tasks %}
+      <tr>
+        <td>{{ t.title }}</td>
+        <td>{{ t.subject }}</td>
+        <td>{{ t.due_date or '-' }}</td>
+        <td><span class="badge {{ t.priority|lower }}">{{ t.priority }}</span></td>
+        <td>{{ t.status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p>No tasks yet. Add some in the <a href="/tasks">Tasks</a> page.</p>
+  {% endif %}
+</section>
+
+<section class="section">
+  <h2>🎯 Career Goals</h2>
+  {% if goals %}
+    <div class="goals-grid">
+    {% for g in goals %}
+      <div class="goal-card">
+        <h4>{{ g.title }}</h4>
+        <p class="muted">{{ g.category }} • Target: {{ g.target_date or 'N/A' }}</p>
+        <div class="progress-bar small">
+          <div class="progress-fill" style="width: {{ g.progress }}%"></div>
+        </div>
+        <p class="small">{{ g.progress }}% complete</p>
+      </div>
+    {% endfor %}
+    </div>
+  {% else %}
+    <p>No career goals added yet.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

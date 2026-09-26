@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Career Goals{% endblock %}
+{% block content %}
+
+<h1>🎯 Career Goals</h1>
+
+<div class="form-card">
+  <h3>Add Career Goal</h3>
+  <form id="goalForm" class="form-grid">
+    <input type="text" name="title" placeholder="Goal title (e.g., Crack ISRO)" required>
+    <select name="category">
+      <option>PSU</option>
+      <option>M.Tech</option>
+      <option>Job</option>
+      <option>Higher Studies</option>
+    </select>
+    <input type="date" name="target_date">
+    <input type="number" name="progress" min="0" max="100" value="0" placeholder="Progress %">
+    <textarea name="description" placeholder="Description / plan"></textarea>
+    <button type="submit" class="btn primary">+ Add Goal</button>
+  </form>
+</div>
+
+<div class="goals-grid">
+  {% for g in goals %}
+  <div class="goal-card" data-id="{{ g.id }}">
+    <h3>{{ g.title }}</h3>
+    <span class="badge">{{ g.category }}</span>
+    <p class="muted">Target: {{ g.target_date or 'N/A' }}</p>
+    <p class="small">{{ g.description }}</p>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: {{ g.progress }}%"></div>
+    </div>
+    <div class="goal-controls">
+      <button class="btn small goal-dec" data-id="{{ g.id }}" data-val="{{ g.progress - 10 }}">-10%</button>
+      <span>{{ g.progress }}%</span>
+      <button class="btn small goal-inc" data-id="{{ g.id }}" data-val="{{ g.progress + 10 }}">+10%</button>
+      <button class="btn danger small delete-goal" data-id="{{ g.id }}">Delete</button>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

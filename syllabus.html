@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Syllabus Tracker{% endblock %}
+{% block content %}
+
+<h1>📚 GATE Syllabus Tracker</h1>
+
+<div class="form-card">
+  <h3>Add Subject</h3>
+  <form id="subjectForm" class="form-grid">
+    <input type="text" name="name" placeholder="Subject name" required>
+    <input type="text" name="branch" placeholder="Branch (CSE/ECE/ME)" value="CSE">
+    <input type="number" name="total_topics" placeholder="Total topics" min="1" required>
+    <input type="number" name="completed_topics" placeholder="Completed" min="0" value="0">
+    <select name="priority">
+      <option>High</option>
+      <option selected>Medium</option>
+      <option>Low</option>
+    </select>
+    <button type="submit" class="btn primary">+ Add Subject</button>
+  </form>
+</div>
+
+<div class="subjects-list">
+  {% for s in subjects %}
+    {% set pct = (s.completed_topics / s.total_topics * 100)|int if s.total_topics else 0 %}
+    <div class="subject-card" data-id="{{ s.id }}">
+      <div class="subject-head">
+        <div>
+          <h3>{{ s.name }}</h3>
+          <span class="muted">{{ s.branch }} • <span class="badge {{ s.priority|lower }}">{{ s.priority }}</span></span>
+        </div>
+        <button class="btn danger small delete-subject" data-id="{{ s.id }}">Delete</button>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ pct }}%"></div>
+      </div>
+      <div class="subject-controls">
+        <button class="btn small inc" data-id="{{ s.id }}" data-val="{{ s.completed_topics + 1 }}">+1 Topic</button>
+        <button class="btn small dec" data-id="{{ s.id }}" data-val="{{ s.completed_topics - 1 }}">-1 Topic</button>
+        <span>{{ s.completed_topics }}/{{ s.total_topics }} ({{ pct }}%)</span>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
